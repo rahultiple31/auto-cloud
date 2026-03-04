@@ -228,3 +228,46 @@ flowchart LR
     ]
 }
 ```
+
+
+## Create role trust policy: sbt-local-role-trust.json
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "TrustRahulUser",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::056732011422:user/rahul"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+
+```
+
+
+## Create Rahul user policy (assume role only): rahul-assume-role-policy.json
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AssumeSbtLocalDeployRole",
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": "arn:aws:iam::056732011422:role/SbtLocalDeployRole"
+    },
+    {
+      "Sid": "GetCallerIdentity",
+      "Effect": "Allow",
+      "Action": "sts:GetCallerIdentity",
+      "Resource": "*"
+    }
+  ]
+}
+
+```
