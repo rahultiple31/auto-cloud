@@ -1,4 +1,4 @@
-name: Deploy SBT Infrastructure
+name: Deploy Agens Dev Infrastructure
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
       CDK_BOOTSTRAP_QUALIFIER: gha659fds
     defaults:
       run:
-        working-directory: infrastructure
+        working-directory: packages/tms-infra-aws
 
     steps:
       - name: Checkout
@@ -100,13 +100,13 @@ jobs:
 
           case "$stack_choice" in
             control-plane-stack.ts)
-              resolved_stack="SbtControlPlaneStack"
+              resolved_stack="AgensDevControlPlaneStack"
               ;;
             application-plane-stack.ts)
-              resolved_stack="SbtApplicationPlaneStack"
+              resolved_stack="AgensDevApplicationPlaneStack"
               ;;
             cicd-pipeline-stack.ts)
-              resolved_stack="SbtCiCdPipelineStack"
+              resolved_stack="AgensDevCiCdPipelineStack"
               ;;
             all-stacks)
               resolved_stack="--all"
@@ -130,7 +130,7 @@ jobs:
           -c systemAdminEmail="$SBT_SYSTEM_ADMIN_EMAIL"
           -c controlPlaneCallbackUrl="$CONTROL_PLANE_CALLBACK_URL"
           -c githubOwner="rahultiple31"
-          -c githubRepo="cdk-web"
+          -c githubRepo="med-aws-repo"
           -c githubBranch="main"
 
 
@@ -145,6 +145,6 @@ jobs:
           -c systemAdminEmail="$SBT_SYSTEM_ADMIN_EMAIL"
           -c controlPlaneCallbackUrl="$CONTROL_PLANE_CALLBACK_URL"
           -c githubOwner="rahultiple31"
-          -c githubRepo="cdk-web"
+          -c githubRepo="med-aws-repo"
           -c githubBranch="main"
 

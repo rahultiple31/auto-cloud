@@ -14,7 +14,7 @@ flowchart LR
   subgraph Control Plane
     CP1[VPC + Subnets]
     CP2[Security Groups]
-    CP3[Cognito + SBT ControlPlane]
+    CP3[Cognito + Agens Dev ControlPlane]
     CP4[Tenant DynamoDB]
     CP5[CloudWatch Dashboard/Alarm]
   end

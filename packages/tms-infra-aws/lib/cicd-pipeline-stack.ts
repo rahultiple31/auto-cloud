@@ -38,12 +38,12 @@ export class SbtCiCdPipelineStack extends cdk.Stack {
       encryption: ecr.RepositoryEncryption.AES_256,
     });
 
-    const buildProject = new codebuild.PipelineProject(this, 'SbtCodeBuildProject', {
+    const buildProject = new codebuild.PipelineProject(this, 'AgensDevCodeBuildProject', {
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
         privileged: true,
       },
-      buildSpec: codebuild.BuildSpec.fromSourceFilename('codebuild-codedeploy/buildspec.yml'),
+      buildSpec: codebuild.BuildSpec.fromSourceFilename('packages/codebuild-codedeploy/buildspec.yml'),
       environmentVariables: {
         ECR_REPOSITORY_URI: { value: containerRepository.repositoryUri },
         POSTGRES_ENDPOINT: { value: props.postgresEndpointAddress },
@@ -73,7 +73,7 @@ export class SbtCiCdPipelineStack extends cdk.Stack {
       })
     );
 
-    const deployProject = new codebuild.PipelineProject(this, 'SbtEksDeployProject', {
+    const deployProject = new codebuild.PipelineProject(this, 'AgensDevEksDeployProject', {
       role: eksDeploymentRole,
       environment: {
         buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
@@ -88,7 +88,7 @@ export class SbtCiCdPipelineStack extends cdk.Stack {
     const sourceOutput = new codepipeline.Artifact('SourceArtifact');
     const buildOutput = new codepipeline.Artifact('BuildArtifact');
 
-    const pipeline = new codepipeline.Pipeline(this, 'SbtEnterpriseCodePipeline', {
+    const pipeline = new codepipeline.Pipeline(this, 'AgensDevEnterpriseCodePipeline', {
       pipelineType: codepipeline.PipelineType.V2,
       crossAccountKeys: false,
       artifactBucket,
