@@ -124,7 +124,7 @@ jobs:
         env:
           SBT_SYSTEM_ADMIN_EMAIL: ${{ secrets.SBT_SYSTEM_ADMIN_EMAIL }}
           CONTROL_PLANE_CALLBACK_URL: ${{ secrets.CONTROL_PLANE_CALLBACK_URL }}
-          GITHUB_OAUTH_TOKEN_SECRET_NAME: ${{ secrets.GITHUB_OAUTH_TOKEN_SECRET_NAME }}
+          OAUTH_TOKEN_SECRET_NAME: ${{ secrets.OAUTH_TOKEN_SECRET_NAME }}
         run: >
           npm run cdk -- synth ${{ steps.resolve_stack.outputs.stack_name }}
           -c @aws-cdk/core:bootstrapQualifier="$CDK_BOOTSTRAP_QUALIFIER"
@@ -133,14 +133,14 @@ jobs:
           -c githubOwner="rahultiple31"
           -c githubRepo="med-aws-repo"
           -c githubBranch="main"
-          -c githubOauthTokenSecretName="${GITHUB_OAUTH_TOKEN_SECRET_NAME:-github/pat/med-aws-repo}"
+          -c githubOauthTokenSecretName="${OAUTH_TOKEN_SECRET_NAME:-github/pat/med-aws-repo}"
 
 
       - name: CDK Deploy
         env:
           SBT_SYSTEM_ADMIN_EMAIL: ${{ secrets.SBT_SYSTEM_ADMIN_EMAIL }}
           CONTROL_PLANE_CALLBACK_URL: ${{ secrets.CONTROL_PLANE_CALLBACK_URL }}
-          GITHUB_OAUTH_TOKEN_SECRET_NAME: ${{ secrets.GITHUB_OAUTH_TOKEN_SECRET_NAME }}
+          OAUTH_TOKEN_SECRET_NAME: ${{ secrets.OAUTH_TOKEN_SECRET_NAME }}
         run: >
           npm run cdk -- deploy ${{ steps.resolve_stack.outputs.stack_name }}
           --require-approval never
@@ -150,5 +150,5 @@ jobs:
           -c githubOwner="rahultiple31"
           -c githubRepo="med-aws-repo"
           -c githubBranch="main"
-          -c githubOauthTokenSecretName="${GITHUB_OAUTH_TOKEN_SECRET_NAME:-github/pat/med-aws-repo}"
+          -c githubOauthTokenSecretName="${OAUTH_TOKEN_SECRET_NAME:-github/pat/med-aws-repo}"
 
