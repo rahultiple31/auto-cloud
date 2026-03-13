@@ -72,6 +72,89 @@ export class SbtApplicationPlaneStack extends cdk.Stack {
       capacityType: eks.CapacityType.ON_DEMAND,
     });
 
+    const cloudwatchNamespace = this.cluster.addManifest('AmazonCloudWatchNamespace', {
+      apiVersion: 'v1',
+      kind: 'Namespace',
+      metadata: {
+        name: 'amazon-cloudwatch',
+      },
+    });
+
+    const ebsCsiServiceAccount = this.cluster.addServiceAccount('EbsCsiControllerServiceAccount', {
+      name: 'ebs-csi-controller-sa',
+      namespace: 'kube-system',
+    });
+    ebsCsiServiceAccount.role.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEBSCSIDriverPolicy')
+    );
+
+    const cloudwatchAgentServiceAccount = this.cluster.addServiceAccount(
+      'CloudWatchAgentServiceAccount',
+      {
+        name: 'cloudwatch-agent',
+        namespace: 'amazon-cloudwatch',
+      }
+    );
+    cloudwatchAgentServiceAccount.node.addDependency(cloudwatchNamespace);
+    cloudwatchAgentServiceAccount.role.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy')
+    );
+    cloudwatchAgentServiceAccount.role.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXrayWriteOnlyAccess')
+    );
+
+    const vpcCniAddon = new eks.CfnAddon(this, 'VpcCniAddon', {
+      addonName: 'vpc-cni',
+      clusterName: this.cluster.clusterName,
+      resolveConflicts: 'OVERWRITE',
+    });
+    const coreDnsAddon = new eks.CfnAddon(this, 'CoreDnsAddon', {
+      addonName: 'coredns',
+      clusterName: this.cluster.clusterName,
+      resolveConflicts: 'OVERWRITE',
+    });
+    const kubeProxyAddon = new eks.CfnAddon(this, 'KubeProxyAddon', {
+      addonName: 'kube-proxy',
+      clusterName: this.cluster.clusterName,
+      resolveConflicts: 'OVERWRITE',
+    });
+    const metricsServerAddon = new eks.CfnAddon(this, 'MetricsServerAddon', {
+      addonName: 'metrics-server',
+      clusterName: this.cluster.clusterName,
+      resolveConflicts: 'OVERWRITE',
+    });
+    const podIdentityAddon = new eks.CfnAddon(this, 'PodIdentityAgentAddon', {
+      addonName: 'eks-pod-identity-agent',
+      clusterName: this.cluster.clusterName,
+      resolveConflicts: 'OVERWRITE',
+    });
+    const ebsCsiAddon = new eks.CfnAddon(this, 'EbsCsiAddon', {
+      addonName: 'aws-ebs-csi-driver',
+      clusterName: this.cluster.clusterName,
+      serviceAccountRoleArn: ebsCsiServiceAccount.role.roleArn,
+      resolveConflicts: 'OVERWRITE',
+    });
+    const cloudwatchAddon = new eks.CfnAddon(this, 'CloudWatchObservabilityAddon', {
+      addonName: 'amazon-cloudwatch-observability',
+      clusterName: this.cluster.clusterName,
+      serviceAccountRoleArn: cloudwatchAgentServiceAccount.role.roleArn,
+      resolveConflicts: 'OVERWRITE',
+    });
+
+    for (const addon of [
+      vpcCniAddon,
+      coreDnsAddon,
+      kubeProxyAddon,
+      metricsServerAddon,
+      podIdentityAddon,
+      ebsCsiAddon,
+      cloudwatchAddon,
+    ]) {
+      addon.node.addDependency(this.cluster);
+    }
+    ebsCsiAddon.node.addDependency(ebsCsiServiceAccount);
+    cloudwatchAddon.node.addDependency(cloudwatchAgentServiceAccount);
+
     this.eksDeploymentRole = new iam.Role(this, 'EksDeploymentCodeBuildRole', {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
       description: 'Role used by CodeBuild deploy stage to apply manifests to EKS.',
