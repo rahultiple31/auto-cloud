@@ -19,7 +19,7 @@ if (!systemAdminEmail) {
 }
 
 const githubOwner = app.node.tryGetContext('githubOwner') ?? 'rahultiple31';
-const githubRepo = app.node.tryGetContext('githubRepo') ?? 'med-aws-repo';
+const githubRepo = app.node.tryGetContext('githubRepo') ?? 'auto-cloud';
 const githubBranch = app.node.tryGetContext('githubBranch') ?? 'main';
 const githubOauthTokenSecretName =
   app.node.tryGetContext('githubOauthTokenSecretName') ??
